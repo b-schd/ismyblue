@@ -1,3 +1,5 @@
+import {UPPER_BOUND, MIDPOINT} from '@/config'
+
 export function fitSigmoid(hues, responses, polarity, tailProbability = 0.2) {
   // Initialize parameters
   let a = 0.2 // Initial guess for a
@@ -25,7 +27,7 @@ export function fitSigmoid(hues, responses, polarity, tailProbability = 0.2) {
 
   const logLikelihood = (a, b) => {
     return hues.reduce((sum, hue, i) => {
-      const z = a * (hue - 180 + b)
+      const z = a * (hue - MIDPOINT + b)
       return sum + (responses[i] ? logSigmoid(z) : logSigmoid(-z))
     }, 0)
   }
@@ -35,33 +37,33 @@ export function fitSigmoid(hues, responses, polarity, tailProbability = 0.2) {
     const ll = logLikelihood(a, b)
     const grad_a =
       hues.reduce((sum, hue, i) => {
-        const z = a * (hue - 180 + b)
+        const z = a * (hue - MIDPOINT + b)
         const s = sigmoid(z)
-        return sum + (responses[i] - s) * (hue - 180 + b)
+        return sum + (responses[i] - s) * (hue - MIDPOINT + b)
       }, 0) -
       (a - priorA.mean) / priorA.sd ** 2
     const grad_b =
       hues.reduce((sum, hue, i) => {
-        const z = a * (hue - 180 + b)
+        const z = a * (hue - MIDPOINT + b)
         const s = sigmoid(z)
         return sum + (responses[i] - s) * a
       }, 0) -
       (b - priorB.mean) / priorB.sd ** 2
     const hess_aa =
       hues.reduce((sum, hue) => {
-        const z = a * (hue - 180 + b)
+        const z = a * (hue - MIDPOINT + b)
         const s = sigmoid(z)
-        return sum - s * (1 - s) * (hue - 180 + b) ** 2
+        return sum - s * (1 - s) * (hue - MIDPOINT + b) ** 2
       }, 0) -
       1 / priorA.sd ** 2
     const hess_ab = hues.reduce((sum, hue) => {
-      const z = a * (hue - 180 + b)
+      const z = a * (hue - MIDPOINT + b)
       const s = sigmoid(z)
-      return sum - s * (1 - s) * a * (hue - 180 + b)
+      return sum - s * (1 - s) * a * (hue - MIDPOINT + b)
     }, 0)
     const hess_bb =
       hues.reduce((sum, hue) => {
-        const z = a * (hue - 180 + b)
+        const z = a * (hue - MIDPOINT + b)
         const s = sigmoid(z)
         return sum - s * (1 - s) * a ** 2
       }, 0) -
@@ -100,8 +102,8 @@ export function fitSigmoid(hues, responses, polarity, tailProbability = 0.2) {
     polarity = Math.random() < 0.5 ? 1 : -1
   }
   let percentile = polarity > 0 ? tailProbability : 1 - tailProbability
-  let newProbe = 180 - b + Math.log(percentile / (1 - percentile)) / a
-  newProbe = Math.max(120, Math.min(newProbe + Math.random() * 2 - 1, 240))
+  let newProbe = MIDPOINT - b + Math.log(percentile / (1 - percentile)) / a
+  newProbe = Math.max(120, Math.min(newProbe + Math.random() * 2 - 1, UPPER_BOUND))
 
   return { a, b, polarity, newProbe }
 }

@@ -4,29 +4,27 @@
       <svg ref="svg" class="w-full h-96"></svg>
       <div class="absolute top-0 left-0 p-1">
         <div class="blue-green-test-result-color">
-          <p class="result-text bg-white bg-opacity-70 p-1 rounded"><i>Your</i> green</p>
+          <p class="result-text bg-white bg-opacity-70 p-1 rounded"><i>Your</i> {{firstColor}}</p>
         </div>
       </div>
       <div class="absolute top-0 right-0 p-1">
         <div class="blue-green-test-result-color">
-          <p class="result-text bg-white bg-opacity-70 p-1 rounded"><i>Your</i> blue</p>
+          <p class="result-text bg-white bg-opacity-70 p-1 rounded"><i>Your</i> {{secondColor}}</p>
         </div>
       </div>
     </div>
     <div class="blue-green-test-result-text w-full mt-0 bg-white">
       <p class="result-text">
         <i>Your</i> boundary is at hue {{ Math.round(userThreshold) }},
-        <span v-if="greenInclusive > 0.55">
-          bluer than {{ Math.round(greenInclusive * 100) }}% of the population. For <i>you</i>,
-          turquoise
-          <span class="color-chip mr-1"></span>
-          is green.
+        
+        <span v-if="greenInclusive > 0.55 & hsl_dim == 0">
+          {{secondColor}}er than {{ Math.round(greenInclusive * 100) }}% of the population.
         </span>
-        <span v-else-if="greenInclusive < 0.45">
-          greener than {{ Math.round((1 - greenInclusive) * 100) }}% of the population. For
-          <i>you</i>, turquoise
-          <span class="color-chip mr-1"></span>
-          is blue.
+        <span v-else-if="greenInclusive < 0.45 & hsl_dim == 0">
+          {{firstColor}}er than {{ Math.round((1 - greenInclusive) * 100) }}% of the population.
+        </span>
+        <span v-else-if="hsl_dim == 2">
+          the same as 100% of the population with <b>BEIGE BABIES!</b>
         </span>
         <span v-else> just like the population median. You're a true neutral. </span>
       </p>
@@ -34,10 +32,26 @@
   </div>
 </template>
 
+<script setup>
+import {FIRST_COLOR, SECOND_COLOR, LOWER_BOUND, UPPER_BOUND, MIDPOINT} from '@/config' // Adjust the import path as needed
+</script>
+
 <script>
 import * as d3 from 'd3'
+import {FIRST_COLOR, SECOND_COLOR, LOWER_BOUND, UPPER_BOUND, MIDPOINT, HSL_DIM} from '@/config' // Adjust the import path as needed
+
 
 export default {
+  data() {
+    return {
+      firstColor: FIRST_COLOR,
+      secondColor: SECOND_COLOR,
+      lower_bound: LOWER_BOUND,
+      upper_bound: UPPER_BOUND,
+      midpoint: MIDPOINT,
+      hsl_dim: HSL_DIM
+    }
+  },
   props: {
     binPosition: Array,
     count: Array,
@@ -47,7 +61,12 @@ export default {
   },
   computed: {
     currentColor() {
-      return `hsl(${this.userThreshold}, 100%, 50%)`
+      if (this.hsl_dim == 0) {
+        return `hsl(${this.userThreshold}, 100%, 50%)`
+      }
+      else {
+        return `hsl(25, 43%, ${this.userThreshold}%)`
+      }
     },
     greenInclusive() {
       const index = this.xCdf.findIndex((value) => value > this.userThreshold)
@@ -62,6 +81,14 @@ export default {
     handleResize() {
       this.createPlot()
     },
+    showPicOnClick() {
+      if (this.hsl_dim == 2) {
+        this.createPlot()
+      }
+      else {
+        this.createPlot()
+      }
+    },
     createPlot() {
       const svg = d3.select(this.$refs.svg)
       // Clear the svg on resize.
@@ -73,8 +100,8 @@ export default {
       const innerWidth = width - margin.left - margin.right
       const innerHeight = height - margin.top - margin.bottom
 
-      let range_l = 155
-      let range_r = 205
+      let range_l = this.lower_bound
+      let range_r = this.upper_bound
       const x = d3.scaleLinear().domain([range_l, range_r]).range([0, innerWidth])
       const y = d3.scaleLinear().domain([0, 1]).range([innerHeight, 0])
 
@@ -90,12 +117,21 @@ export default {
         .attr('x2', '100%')
         .attr('y2', '0%')
 
+      
       for (let i = range_l; i <= range_r; i++) {
         const hue = i
+        let hsl;
+        if (this.hsl_dim == 0) {
+          hsl = `hsl(${hue % 360}, 100%, 50%)`
+        }
+        else {
+          hsl = `hsl(25, 43%, ${hue}%)`
+        }
+        
         gradient
           .append('stop')
           .attr('offset', `${((i - range_l) / (range_r - range_l)) * 100}%`)
-          .attr('stop-color', `hsl(${hue}, 100%, 50%)`)
+          .attr('stop-color', hsl)
       }
 
       g.append('rect')
@@ -208,10 +244,12 @@ export default {
         .attr('stroke-width', 3)
 
       window.addEventListener('resize', this.handleResize)
+      window.addEventListener('click', this.showPicOnClick)
     }
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('click', this.showPicOnClick)
   }
 }
 </script>

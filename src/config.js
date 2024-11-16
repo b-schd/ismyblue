@@ -8,13 +8,32 @@ export const MAX_ROUNDS = 8 // 2^6, hence max resolution of 1.
 // Version 0.0.7 fixed the timestamp localization and moved the keys into a separate file.
 // Version 0.0.8 fixed the stability of the GLM fit, added noise to the probe color, and randomized the button order
 // it increased the number of rounds to 8 which in simulations led to better inferences.
-export const VERSION = '0.1.0'
+export const VERSION = '0.2.0'
 
-export const FIRST_COLOR = 'pink' // originally 'green'
-export const SECOND_COLOR = 'red' // originally 'blue'
-export const LOWER_BOUND = 300  // really 120, originally 150
-export const UPPER_BOUND = 360  // really 240, originally 210
-export const MIDPOINT = 330     // originally 180
+// export const FIRST_COLOR = 'green' // originally 'green'
+// export const SECOND_COLOR = 'blue' // originally 'blue'
+// export const LOWER_BOUND = 150  // really 120, originally 150
+// export const UPPER_BOUND = 210  // really 240, originally 210
+// export const MIDPOINT = 180     // originally 180
+// export const HSL_DIM = 0 // dimension of hsl index that is varying
+
+
+// Red - Pink
+// export const FIRST_COLOR = 'pink' 
+// export const SECOND_COLOR = 'red' 
+// export const LOWER_BOUND = 300  
+// export const UPPER_BOUND = 370  
+// export const MIDPOINT = 335   
+// export const HSL_DIM = 0 // dimension of hsl index that is varying
+
+// Brown - Tan
+export const FIRST_COLOR = 'brown' 
+export const SECOND_COLOR = 'tan' 
+export const LOWER_BOUND = 35  
+export const UPPER_BOUND = 85  
+export const MIDPOINT = 60   
+export const HSL_DIM = 2 // dimension of hsl index that is varying
+
 
 
 export const BIN_POSITION = [
@@ -30,7 +49,8 @@ export const BIN_POSITION = [
   181.718757442617, 181.748027723212, 182.336602868167, 182.369640395527, 183.000268379619,
   183.213988171777, 184.404787597005, 184.868171883489, 185.164187117587, 187.169695068709,
   189.186857728744, 193.290658427174, 210.557520901061
-]
+] + 140 // - 134.301141318471) * (UPPER_BOUND - LOWER_BOUND) + LOWER_BOUND
+
 export const BIN_COUNT = [
   0.008130081300813009, 0.008130081300813009, 0.016260162601626018, 0.008130081300813009,
   0.008130081300813009, 0.008130081300813009, 0.016260162601626018, 0.008130081300813009,
@@ -48,7 +68,7 @@ export const BIN_COUNT = [
   0.008130081300813009, 0.024390243902439025, 0.008130081300813009, 0.008130081300813009,
   0.008130081300813009, 0.008130081300813009
 ]
-export const X_CDF = [
+export const X_CDF_orig = [
   134.301141318471, 134.301141318471, 153.503134757856, 153.503134757856, 158.56843732322,
   158.56843732322, 160.302303286645, 160.302303286645, 162.514185616824, 162.514185616824,
   163.703518721884, 163.703518721884, 164.344468743918, 164.344468743918, 164.462960967657,
@@ -73,7 +93,10 @@ export const X_CDF = [
   184.868171883489, 185.164187117587, 185.164187117587, 187.169695068709, 187.169695068709,
   189.186857728744, 189.186857728744, 193.290658427174, 193.290658427174, 210.557520901061,
   210.557520901061
-]
+] // - 134.301141318471) * (UPPER_BOUND - LOWER_BOUND) + LOWER_BOUND
+
+export const X_CDF = X_CDF_orig.map(value => (value - 134)/80 * (UPPER_BOUND - LOWER_BOUND) + LOWER_BOUND)
+
 export const Y_CDF = [
   0.0, 0.008130081300813009, 0.008130081300813009, 0.016260162601626018, 0.016260162601626018,
   0.032520325203252036, 0.032520325203252036, 0.04065040650406505, 0.04065040650406505,

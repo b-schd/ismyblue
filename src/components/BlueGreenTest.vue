@@ -174,7 +174,7 @@ import { MAX_ROUNDS, BIN_POSITION, BIN_COUNT, X_CDF, Y_CDF, FIRST_COLOR, SECOND_
 </script>
 
 <script>
-import { MAX_ROUNDS, VERSION, BIN_POSITION, BIN_COUNT, X_CDF, Y_CDF, FIRST_COLOR, SECOND_COLOR, LOWER_BOUND, UPPER_BOUND, MIDPOINT} from '@/config'
+import { MAX_ROUNDS, VERSION, BIN_POSITION, BIN_COUNT, X_CDF, Y_CDF, FIRST_COLOR, SECOND_COLOR, LOWER_BOUND, UPPER_BOUND, MIDPOINT, HSL_DIM} from '@/config'
 import confetti from 'https://cdn.skypack.dev/canvas-confetti'
 import Results from './Results.vue'
 import { fitSigmoid } from '@/utils/glmUtils'
@@ -192,6 +192,7 @@ export default {
       lower_bound: LOWER_BOUND,
       upper_bound: UPPER_BOUND,
       midpoint: MIDPOINT,
+      hsl_dim: HSL_DIM,
       currentHue: Math.random() > 0.5 ? LOWER_BOUND : UPPER_BOUND,
       showInitialMessage: true,
       polarity: 0,
@@ -217,13 +218,28 @@ export default {
       return this.greenButtonRight ? this.secondColor : this.firstColor
     },
     currentColor() {
-      return `hsl(${this.currentHue}, 100%, 50%)`
+      if (this.hsl_dim == 0) {
+        return `hsl(${this.currentHue % 360}, 100%, 50%)`
+      }
+      else {
+        return `hsl(25, 100%, ${this.currentHue%100}%)`
+      }
     },
     bluerColor() {
-      return `hsl(${this.finalHue + 5}, 100%, 50%)`
+      if (this.hsl_dim == 0) {
+        return `hsl(${(this.finalHue + 5) %360}, 100%, 50%)`
+      }
+      else {
+        return `hsl(25, 43%, ${(this.finalHue + 5)%100}%)`
+      }
     },
     greenerColor() {
-      return `hsl(${this.finalHue - 5}, 100%, 50%)`
+      if (this.hsl_dim == 0) {
+        return `hsl(${(this.finalHue - 5) % 360}, 100%, 50%)`
+      }
+      else {
+        return `hsl(25, 43%, ${(this.finalHue - 5)%100}%)`
+      }
     },
     containerStyle() {
       if (this.rounds === MAX_ROUNDS) {
