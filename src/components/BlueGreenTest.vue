@@ -7,7 +7,7 @@
             <span class="background-white">Test <i>your</i> color categorization</span>
           </h1>
           <h1 v-else key="main" class="blue-green-test-title">
-            <span class="background-white">Is <i>my</i> blue <i>your</i> blue?</span>
+            <span class="background-white">Is <i>my</i> {{secondColor}} <i>your</i> {{secondColor}}?</span>
           </h1>
         </transition>
       </div>
@@ -47,7 +47,7 @@
       <div class="about-content">
         <h2>Whoops!</h2>
         <p>
-          The first color is always very green or very blue. If you mislabel the first color, you
+          The first color is always very {{firstColor}} or very {{secondColor}}. If you mislabel the first color, you
           won't get accurate thresholds. This might indicate you have an unusually calibrated
           screen, a night filter, or you made a mistake. Try again?
         </p>
@@ -55,7 +55,7 @@
       </div>
     </div>
     <div
-      v-if="rounds == MAX_ROUNDS && (allSame == 'blue' || allSame == 'green')"
+      v-if="rounds == MAX_ROUNDS && (allSame == this.secondColor || allSame == this.firstColor)"
       class="about-popup"
     >
       <div class="about-content">
@@ -75,7 +75,7 @@
           People have different names for the colors they see.
           <a href="https://en.wikipedia.org/wiki/Sapir%E2%80%93Whorf_hypothesis" target="_blank"
             >Language can affect how we memorize and name colors</a
-          >. This is a color naming test designed to measure your personal blue-green boundary.
+          >. This is a color naming test designed to measure your personal {{secondColor}}-{{firstColor}} boundary.
         </p>
         <h2>Test validity</h2>
         <p>
@@ -107,15 +107,15 @@
         <h2>Technical Details</h2>
         <p>
           The test asks you to categorize colors sequentially. Colors are often represented in HSL
-          (hue, saturation, lightness) color space. Hue 120 is green, and hue 240 is blue. The test
-          focuses on blue-green hues between 150 and 210. On the web, HSL coordinates are translated
+          (hue, saturation, lightness) color space. Hue {{lower_bound}} is {{firstColor}}, and hue {{upper_bound}} is {{secondColor}}. The test
+          focuses on {{secondColor}}-{{firstColor}} hues between {{lower_bound}} and {{upper_bound}}. On the web, HSL coordinates are translated
           to
           <a href="https://en.wikipedia.org/wiki/SRGB">sRGB color space</a>, the standard color
           space of the web, which is not perceptually uniform. These sRGB values are translated
           nonlinearly to your monitor through a gamma curve.
         </p>
         <p>
-          The test assumes that your responses between blue and green are represented by a sigmoid
+          The test assumes that your responses between {{secondColor}} and {{firstColor}} are represented by a sigmoid
           curve. It sequentially fits that sigmoid curve to your responses:
         </p>
 
@@ -143,9 +143,9 @@
           In early experiments, we found that people's responses cluster around 175, which
           coincidentally is the same as the named HTML color turquoise
           <span class="color-chip-turquoise mr-1"></span>. This is interesting, because the nominal
-          boundary between blue and green is at 180, the named HTML color cyan
+          boundary between {{secondColor}} and {{firstColor}} is at 180, the named HTML color cyan
           <span class="color-chip-cyan mr-1"></span>. That means most people's boundaries are
-          shifted toward saying that cyan is blue.
+          shifted toward saying that cyan is {{secondColor}}.
         </p>
         <h2>What information does this website collect?</h2>
         <p>
@@ -170,11 +170,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import { MAX_ROUNDS, BIN_POSITION, BIN_COUNT, X_CDF, Y_CDF } from '@/config' // Adjust the import path as needed
+import { MAX_ROUNDS, BIN_POSITION, BIN_COUNT, X_CDF, Y_CDF, FIRST_COLOR, SECOND_COLOR} from '@/config' // Adjust the import path as needed
 </script>
 
 <script>
-import { MAX_ROUNDS, VERSION, BIN_POSITION, BIN_COUNT, X_CDF, Y_CDF } from '@/config'
+import { MAX_ROUNDS, VERSION, BIN_POSITION, BIN_COUNT, X_CDF, Y_CDF, FIRST_COLOR, SECOND_COLOR, LOWER_BOUND, UPPER_BOUND, MIDPOINT} from '@/config'
 import confetti from 'https://cdn.skypack.dev/canvas-confetti'
 import Results from './Results.vue'
 import { fitSigmoid } from '@/utils/glmUtils'
@@ -187,7 +187,12 @@ export default {
   },
   data() {
     return {
-      currentHue: Math.random() > 0.5 ? 150 : 210,
+      firstColor: FIRST_COLOR,
+      secondColor: SECOND_COLOR,
+      lower_bound: LOWER_BOUND,
+      upper_bound: UPPER_BOUND,
+      midpoint: MIDPOINT,
+      currentHue: Math.random() > 0.5 ? LOWER_BOUND : UPPER_BOUND,
       showInitialMessage: true,
       polarity: 0,
       rounds: 0,
@@ -206,10 +211,10 @@ export default {
   },
   computed: {
     rightButton() {
-      return this.greenButtonRight ? 'green' : 'blue'
+      return this.greenButtonRight ? this.firstColor : this.secondColor
     },
     leftButton() {
-      return this.greenButtonRight ? 'blue' : 'green'
+      return this.greenButtonRight ? this.secondColor : this.firstColor
     },
     currentColor() {
       return `hsl(${this.currentHue}, 100%, 50%)`
@@ -244,9 +249,9 @@ export default {
       this.responses.push({ hue: this.currentHue, response: color })
 
       if (this.rounds === 0) {
-        if (color === 'blue' && this.currentHue < 180) {
+        if (color === this.secondColor && this.currentHue < this.midpoint) {
           this.firstColorMislabeled = true
-        } else if (color === 'green' && this.currentHue > 180) {
+        } else if (color === this.firstColor && this.currentHue > this.midpoint) {
           this.firstColorMislabeled = true
         }
         if (this.firstColorMislabeled) {
@@ -257,7 +262,7 @@ export default {
       // Get the new probe value
       const { b, newProbe, polarity } = fitSigmoid(
         this.responses.map((r) => r.hue),
-        this.responses.map((r) => r.response === 'blue'),
+        this.responses.map((r) => r.response === this.secondColor),
         this.polarity,
         0.4
       )
@@ -266,13 +271,13 @@ export default {
       this.rounds++
       if (this.rounds === MAX_ROUNDS) {
         if (
-          this.responses.every((r) => r.response === 'blue') ||
-          this.responses.every((r) => r.response === 'green')
+          this.responses.every((r) => r.response === this.secondColor) ||
+          this.responses.every((r) => r.response === this.firstColor)
         ) {
           this.allSame = this.responses[0].response
           return
         }
-        this.finalHue = 180 - b
+        this.finalHue = this.midpoint - b
         this.currentHue = this.finalHue
         this.showResults = true
         confetti()
@@ -283,9 +288,9 @@ export default {
       }, 200)
     },
     reset() {
-      let currentHue = Math.random() > 0.5 ? 150 : 210
+      let currentHue = Math.random() > 0.5 ? this.lower_bound : this.upper_bound
       if (this.firstColorMislabeled) {
-        currentHue = this.currentHue == 210 ? 150 : 210
+        currentHue = this.currentHue == this.upper_bound ? this.lower_bound : this.upper_bound
       }
 
       this.currentHue = currentHue

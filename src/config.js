@@ -9,6 +9,14 @@ export const MAX_ROUNDS = 8 // 2^6, hence max resolution of 1.
 // Version 0.0.8 fixed the stability of the GLM fit, added noise to the probe color, and randomized the button order
 // it increased the number of rounds to 8 which in simulations led to better inferences.
 export const VERSION = '0.1.0'
+
+export const FIRST_COLOR = 'pink' // originally 'green'
+export const SECOND_COLOR = 'red' // originally 'blue'
+export const LOWER_BOUND = 300  // really 120, originally 150
+export const UPPER_BOUND = 360  // really 240, originally 210
+export const MIDPOINT = 330     // originally 180
+
+
 export const BIN_POSITION = [
   134.301141318471, 153.503134757856, 158.56843732322, 160.302303286645, 162.514185616824,
   163.703518721884, 164.344468743918, 164.462960967657, 165.598525868342, 166.183872810368,
