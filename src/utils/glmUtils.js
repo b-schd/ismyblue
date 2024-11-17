@@ -1,4 +1,4 @@
-import {UPPER_BOUND, MIDPOINT} from '@/config'
+import {LOWER_BOUND, UPPER_BOUND, MIDPOINT} from '@/config'
 
 export function fitSigmoid(hues, responses, polarity, tailProbability = 0.2) {
   // Initialize parameters
@@ -103,7 +103,8 @@ export function fitSigmoid(hues, responses, polarity, tailProbability = 0.2) {
   }
   let percentile = polarity > 0 ? tailProbability : 1 - tailProbability
   let newProbe = MIDPOINT - b + Math.log(percentile / (1 - percentile)) / a
-  newProbe = Math.max(120, Math.min(newProbe + Math.random() * 2 - 1, UPPER_BOUND))
+  newProbe = Math.max(LOWER_BOUND, Math.min(newProbe + Math.random() * 2 - 1, UPPER_BOUND))
+  
 
   return { a, b, polarity, newProbe }
 }

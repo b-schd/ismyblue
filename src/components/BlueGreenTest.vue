@@ -55,7 +55,7 @@
       </div>
     </div>
     <div
-      v-if="rounds == MAX_ROUNDS && (allSame == this.secondColor || allSame == this.firstColor)"
+      v-if="rounds == MAX_ROUNDS && (allSame == secondColor || allSame == firstColor)"
       class="about-popup"
     >
       <div class="about-content">
@@ -222,6 +222,7 @@ export default {
         return `hsl(${this.currentHue % 360}, 100%, 50%)`
       }
       else {
+        console.log("current hue", this.currentHue)
         return `hsl(25, 100%, ${this.currentHue%100}%)`
       }
     },
@@ -230,7 +231,7 @@ export default {
         return `hsl(${(this.finalHue + 5) %360}, 100%, 50%)`
       }
       else {
-        return `hsl(25, 43%, ${(this.finalHue + 5)%100}%)`
+        return `hsl(25, 43%, ${(this.finalHue + 5) %100}%)`
       }
     },
     greenerColor() {
