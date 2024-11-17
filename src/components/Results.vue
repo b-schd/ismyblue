@@ -65,6 +65,7 @@ export default {
         return `hsl(${this.userThreshold}, 100%, 50%)`
       }
       else {
+        
         return `hsl(25, 43%, ${this.userThreshold}%)`
       }
     },
@@ -83,7 +84,8 @@ export default {
     },
     showPicOnClick() {
       if (this.hsl_dim == 2) {
-        this.createPlot()
+        this.show_pic("./src/assets/results_pic.png")
+
       }
       else {
         this.createPlot()
@@ -245,7 +247,19 @@ export default {
 
       window.addEventListener('resize', this.handleResize)
       window.addEventListener('click', this.showPicOnClick)
-    }
+    },
+    show_pic(imagePath) {
+      // Get the SVG element by its ref or class
+      const svg = d3.select(this.$refs.svg)
+      svg.selectAll('*').remove()
+ 
+      // Append an <image> element to the SVG
+      svg.append("image")
+          .attr("xlink:href", imagePath) // Use xlink:href for compatibility
+          .attr("width", "100%")
+          .attr("height", "100%")
+          .attr("preserveAspectRatio", "xMidYMid meet");
+    },
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize)

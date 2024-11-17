@@ -19,20 +19,20 @@ export const VERSION = '0.2.0'
 
 
 // Red - Pink
-// export const FIRST_COLOR = 'pink' 
-// export const SECOND_COLOR = 'red' 
-// export const LOWER_BOUND = 300  
-// export const UPPER_BOUND = 370  
-// export const MIDPOINT = 335   
-// export const HSL_DIM = 0 // dimension of hsl index that is varying
+export const FIRST_COLOR = 'pink' 
+export const SECOND_COLOR = 'red' 
+export const LOWER_BOUND = 300  
+export const UPPER_BOUND = 370  
+export const MIDPOINT = 335   
+export const HSL_DIM = 0 // dimension of hsl index that is varying
 
-// Brown - Tan
-export const FIRST_COLOR = 'brown' 
-export const SECOND_COLOR = 'tan' 
-export const LOWER_BOUND = 35  
-export const UPPER_BOUND = 85  
-export const MIDPOINT = 60   
-export const HSL_DIM = 2 // dimension of hsl index that is varying
+// // Brown - Tan
+// export const FIRST_COLOR = 'brown' 
+// export const SECOND_COLOR = 'tan' 
+// export const LOWER_BOUND = 35  
+// export const UPPER_BOUND = 85  
+// export const MIDPOINT = 60   
+// export const HSL_DIM = 2 // dimension of hsl index that is varying
 
 
 

@@ -223,7 +223,7 @@ export default {
       }
       else {
         console.log("current hue", this.currentHue)
-        return `hsl(25, 100%, ${this.currentHue%100}%)`
+        return `hsl(25, 43%, ${this.currentHue%100}%)`
       }
     },
     bluerColor() {
